@@ -1,0 +1,17 @@
+<svg width="960" height="520" viewBox="0 0 960 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sample Rust Technical Audit Toolkit terminal output">
+  <rect width="960" height="520" rx="8" fill="#121417"/>
+  <rect x="0" y="0" width="960" height="44" rx="8" fill="#22262B"/>
+  <circle cx="24" cy="22" r="6" fill="#E35D5B"/>
+  <circle cx="46" cy="22" r="6" fill="#E8C15A"/>
+  <circle cx="68" cy="22" r="6" fill="#58C772"/>
+  <text x="28" y="88" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">$ rta ./backend --summary</text>
+  <text x="28" y="142" fill="#9AD5FF" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="24">Rust Technical Audit Toolkit</text>
+  <text x="28" y="190" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Repository: /work/backend</text>
+  <text x="28" y="228" fill="#73E0A9" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Overall score: 84/100</text>
+  <text x="28" y="266" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Crates: 7</text>
+  <text x="28" y="304" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Dependencies: 42 direct</text>
+  <text x="28" y="342" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Maintainability: 88/100</text>
+  <text x="28" y="380" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Architecture: 81/100</text>
+  <text x="28" y="418" fill="#DDE3EA" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Testing: 76/100</text>
+  <text x="28" y="456" fill="#F4C779" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="20">Risks: 3 finding(s)</text>
+</svg>

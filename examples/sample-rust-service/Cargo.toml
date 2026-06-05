@@ -1,0 +1,12 @@
+[package]
+name = "sample-rust-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = "1"
+tokio = "1"
+axum = "0.7"
+
+[dev-dependencies]
+pretty_assertions = "1"

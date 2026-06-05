@@ -1,0 +1,19 @@
+[package]
+name = "rta"
+version = "0.1.0"
+description = "CLI for Rust technical due diligence assessments"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "rta"
+path = "src/main.rs"
+
+[dependencies]
+rta-core = { path = "../audit-core" }
+
+[lints]
+workspace = true

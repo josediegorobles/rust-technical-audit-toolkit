@@ -1,0 +1,16 @@
+[package]
+name = "rta-core"
+version = "0.1.0"
+description = "Core analyzers and report model for the Rust Technical Audit Toolkit"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "rta_core"
+path = "src/lib.rs"
+
+[lints]
+workspace = true

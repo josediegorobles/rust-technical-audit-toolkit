@@ -1,0 +1,21 @@
+[workspace]
+members = [
+    "crates/audit-core",
+    "crates/audit-cli",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/example/rust-technical-audit-toolkit"
+homepage = "https://github.com/example/rust-technical-audit-toolkit"
+rust-version = "1.76"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+dbg_macro = "deny"
+todo = "deny"
