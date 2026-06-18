@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.0 - 2026-06-18
+
+### Added
+
+- Added `rta audit-pack [PATH] --output DIR` to generate a due diligence evidence pack.
+- Added evidence pack files: `executive-report.md`, `scorecard.json`, `evidence.json`, `risk-register.json`, `review-questions.md`, and `methodology.md`.
+- Added stable schema versions for evidence and risk register JSON output.
+- Added score-driven and finding-driven review questions for manual diligence follow-up.
+- Added regression tests for audit pack file generation, JSON validity, Markdown sections, scorecard shape, scoring weights, and sample repository signals.
+
+### Changed
+
+- Expanded scorecard JSON with core repository metrics.
+- Improved testing detection around integration tests and async test attributes.
+- Improved workspace member collection for multiline `Cargo.toml` declarations.
+
 ## v0.1.0 - 2026-06-12
 
 Initial marketing-ready release candidate for the Rust Technical Audit Toolkit.

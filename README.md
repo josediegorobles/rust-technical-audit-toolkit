@@ -71,6 +71,7 @@ cargo run -p rust-technical-audit-toolkit -- examples/sample-rust-service --summ
 ```bash
 rta [PATH] [--markdown|--json|--summary] [--output FILE]
 rta scorecard [PATH] --json [--output FILE]
+rta audit-pack [PATH] --output DIR
 ```
 
 Examples:
@@ -80,6 +81,7 @@ rta . --summary
 rta ./service --json
 rta ./service --markdown --output audit-report.md
 rta scorecard ./service --json --output scorecard.json
+rta audit-pack ./service --output audit-pack
 ```
 
 ## CI Scorecard
@@ -138,6 +140,15 @@ See [.github/workflows/audit-pr.yml](.github/workflows/audit-pr.yml) and [docs/g
 - Recommendations
 - Overall Score
 
+`audit-pack` generates a complete diligence folder with:
+
+- `executive-report.md`: human-readable technical due diligence report
+- `scorecard.json`: compact CI/dashboard scorecard
+- `evidence.json`: machine-readable signals behind the assessment
+- `risk-register.json`: structured findings with stable risk IDs
+- `review-questions.md`: score-driven and finding-driven follow-up questions
+- `methodology.md`: scope, scoring model, and interpretation notes
+
 Sample reports:
 
 - [Tokio audit sample](docs/sample-reports/tokio.md)
@@ -167,7 +178,7 @@ The workspace is split into:
 - `crates/audit-cli`: CLI argument handling and command execution
 - `examples/sample-rust-service`: small fixture repository for demos and regression checks
 
-Analyzer modules implement a shared trait and consume a `RepositorySnapshot`. This keeps rules extensible and avoids coupling the CLI to assessment logic.
+Analyzer modules implement a shared trait and consume a `RepositorySnapshot`. Report and evidence-pack renderers stay in the core crate so the CLI can remain a thin delivery layer.
 
 ## Roadmap
 
