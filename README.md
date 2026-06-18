@@ -1,12 +1,37 @@
 # Rust Technical Audit Toolkit
 
-Rust Technical Audit Toolkit (`rta`) is a CLI-first technical due diligence tool for Rust codebases.
+**72h Technical Due Diligence Flash for Rust codebases.**
 
-It helps CTOs, founders, investors, engineering managers, and consulting engineers form a fast, structured view of repository health before deeper manual review.
+![Audited 3 famous crates](https://img.shields.io/badge/audited-3%20famous%20crates-2ea44f)
+![CLI scorecard](https://img.shields.io/badge/CI-scorecard%20JSON-blue)
+![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green)
+![crates.io](https://img.shields.io/crates/v/rust-technical-audit-toolkit)
 
-This is not a security scanner. It is not a linter. It is an engineering assessment platform focused on architecture, maintainability, dependency posture, testing maturity, and delivery risk.
+In 30 seconds, a founder, VC, or CTO can see the kind of diligence output the toolkit generates:
 
-![Sample CLI output](docs/assets/sample-terminal.svg)
+| Audited crate | Overall | Sub-scores | Report |
+| --- | ---: | --- | --- |
+| Tokio | 46/100 | deps 36, quality 8, arch 50, tests 100, risk 62 | [docs/sample-reports/tokio.md](docs/sample-reports/tokio.md) |
+| Axum | 46/100 | deps 21, quality 16, arch 60, tests 100, risk 52 | [docs/sample-reports/axum.md](docs/sample-reports/axum.md) |
+| Sled | 64/100 | deps 76, quality 16, arch 70, tests 100, risk 82 | [docs/sample-reports/sled.md](docs/sample-reports/sled.md) |
+
+Ratatui is also included as a fourth generated benchmark sample: [docs/sample-reports/ratatui.md](docs/sample-reports/ratatui.md).
+
+```text
+Rust Technical Audit Toolkit
+Repository: ./service
+Overall score: 94/100
+Crates: 1
+Dependencies: 4 direct
+Maintainability: 100/100
+Architecture: 90/100
+Testing: 79/100
+Risks: 0 finding(s)
+```
+
+`rta` is a CLI-first technical due diligence tool for Rust codebases. It helps consulting engineers form a fast, structured view of architecture, maintainability, dependency posture, testing maturity, and delivery risk before deeper manual review.
+
+This is not a security scanner. It is not a linter. It is an engineering assessment platform for commercial technical due diligence.
 
 ## What It Analyzes
 
@@ -21,20 +46,31 @@ This is not a security scanner. It is not a linter. It is an engineering assessm
 
 ## Install
 
+Install the published CLI:
+
 ```bash
-cargo install --path crates/audit-cli
+cargo install rust-technical-audit-toolkit
 ```
+
+This installs the `rta` executable:
+
+```bash
+rta . --summary
+```
+
+The crates.io package is named `rust-technical-audit-toolkit` because `rta` is already published by another project. The binary name remains `rta`.
 
 For local development:
 
 ```bash
-cargo run -p rta -- examples/sample-rust-service --summary
+cargo run -p rust-technical-audit-toolkit -- examples/sample-rust-service --summary
 ```
 
 ## CLI Usage
 
 ```bash
 rta [PATH] [--markdown|--json|--summary] [--output FILE]
+rta scorecard [PATH] --json [--output FILE]
 ```
 
 Examples:
@@ -43,13 +79,40 @@ Examples:
 rta . --summary
 rta ./service --json
 rta ./service --markdown --output audit-report.md
+rta scorecard ./service --json --output scorecard.json
 ```
+
+## CI Scorecard
+
+`rta scorecard --json` emits a small, stable JSON contract suitable for CI gates, dashboards, and PR comments:
+
+```json
+{
+  "schema_version": "rta.scorecard.v1",
+  "overall_score": 94,
+  "scores": {
+    "dependency_health": 96,
+    "code_quality": 100,
+    "architecture": 90,
+    "testing": 79,
+    "risk_posture": 100
+  },
+  "risk_findings": {
+    "total": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  }
+}
+```
+
+See [.github/workflows/audit-pr.yml](.github/workflows/audit-pr.yml) and [docs/github-actions-pr-comment.md](docs/github-actions-pr-comment.md) for a reusable GitHub Actions PR comment workflow.
 
 ## Output Formats
 
 `--summary` prints a compact executive snapshot for triage.
 
-`--json` emits machine-readable output for dashboards, pipelines, or consulting portals.
+`--json` emits the full machine-readable audit report for dashboards, pipelines, or consulting portals.
 
 `--markdown` generates a professional due diligence report with:
 
@@ -62,7 +125,12 @@ rta ./service --markdown --output audit-report.md
 - Recommendations
 - Overall Score
 
-See [docs/sample-report.md](docs/sample-report.md) for an example.
+Sample reports:
+
+- [Tokio audit sample](docs/sample-reports/tokio.md)
+- [Axum audit sample](docs/sample-reports/axum.md)
+- [Sled audit sample](docs/sample-reports/sled.md)
+- [Ratatui audit sample](docs/sample-reports/ratatui.md)
 
 ## Scoring Model
 
@@ -76,7 +144,7 @@ The first scoring model is intentionally transparent:
 | Testing | 15% |
 | Risk Posture | 15% |
 
-Scores are heuristic indicators, not absolute judgments. The tool is designed to make senior review faster by surfacing where manual diligence should focus.
+Scores are heuristic indicators, not absolute judgments. The tool is designed to make senior review faster by surfacing where manual diligence should focus. Unsupported metrics are omitted rather than fabricated.
 
 ## Architecture
 

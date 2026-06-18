@@ -1,5 +1,5 @@
 [package]
-name = "rta"
+name = "rust-technical-audit-toolkit"
 version = "0.1.0"
 description = "CLI for Rust technical due diligence assessments"
 edition.workspace = true
@@ -7,13 +7,23 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 rust-version.workspace = true
+readme = "../../README.md"
+keywords = ["rust", "audit", "cli", "due-diligence", "scorecard"]
+categories = ["command-line-utilities", "development-tools"]
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "../../README.md",
+    "../../LICENSE-MIT",
+    "../../LICENSE-APACHE",
+]
 
 [[bin]]
 name = "rta"
 path = "src/main.rs"
 
 [dependencies]
-rta-core = { path = "../audit-core" }
+rta-core = { version = "0.1.0", path = "../audit-core" }
 
 [lints]
 workspace = true

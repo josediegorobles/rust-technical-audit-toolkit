@@ -7,6 +7,16 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 rust-version.workspace = true
+readme = "../../README.md"
+keywords = ["rust", "audit", "due-diligence", "scorecard"]
+categories = ["development-tools"]
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "../../README.md",
+    "../../LICENSE-MIT",
+    "../../LICENSE-APACHE",
+]
 
 [lib]
 name = "rta_core"
