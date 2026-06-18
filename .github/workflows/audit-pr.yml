@@ -1,0 +1,115 @@
+name: Rust Technical Audit PR Comment
+
+on:
+  workflow_call:
+    inputs:
+      audit-path:
+        description: Path to audit.
+        required: false
+        default: .
+        type: string
+      markdown-report:
+        description: Markdown report output path.
+        required: false
+        default: rta-report.md
+        type: string
+      scorecard-json:
+        description: Scorecard JSON output path.
+        required: false
+        default: rta-scorecard.json
+        type: string
+      comment:
+        description: Create or update a PR comment when the caller event is a pull request.
+        required: false
+        default: true
+        type: boolean
+      install-command:
+        description: Command used to install the rta binary.
+        required: false
+        default: cargo install rust-technical-audit-toolkit --locked
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  audit:
+    name: Audit Rust codebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rta
+        run: ${{ inputs.install-command }}
+
+      - name: Generate audit report
+        run: |
+          rta "${{ inputs.audit-path }}" --markdown --output "${{ inputs.markdown-report }}"
+          rta scorecard "${{ inputs.audit-path }}" --json --output "${{ inputs.scorecard-json }}"
+
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-technical-audit
+          path: |
+            ${{ inputs.markdown-report }}
+            ${{ inputs.scorecard-json }}
+
+      - name: Comment on PR
+        if: inputs.comment && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const marker = "<!-- rta-pr-audit -->";
+            const scorecard = JSON.parse(fs.readFileSync("${{ inputs.scorecard-json }}", "utf8"));
+            const report = fs.readFileSync("${{ inputs.markdown-report }}", "utf8");
+            const excerpt = report.split("\n").slice(0, 80).join("\n");
+            const body = `${marker}
+            ## Rust Technical Audit
+
+            **Overall score:** ${scorecard.overall_score}/100
+
+            | Area | Score |
+            | --- | ---: |
+            | Dependency Health | ${scorecard.scores.dependency_health} |
+            | Code Quality | ${scorecard.scores.code_quality} |
+            | Architecture | ${scorecard.scores.architecture} |
+            | Testing | ${scorecard.scores.testing} |
+            | Risk Posture | ${scorecard.scores.risk_posture} |
+
+            **Risk findings:** ${scorecard.risk_findings.total} total, ${scorecard.risk_findings.high} high, ${scorecard.risk_findings.medium} medium, ${scorecard.risk_findings.low} low.
+
+            <details>
+            <summary>Report excerpt</summary>
+
+            ${excerpt}
+
+            </details>`;
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const previous = comments.data.find((comment) => comment.body.includes(marker));
+
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: previous.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }

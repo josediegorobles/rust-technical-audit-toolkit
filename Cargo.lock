@@ -3,12 +3,12 @@
 version = 3
 
 [[package]]
-name = "rta"
+name = "rta-core"
+version = "0.1.0"
+
+[[package]]
+name = "rust-technical-audit-toolkit"
 version = "0.1.0"
 dependencies = [
  "rta-core",
 ]
-
-[[package]]
-name = "rta-core"
-version = "0.1.0"

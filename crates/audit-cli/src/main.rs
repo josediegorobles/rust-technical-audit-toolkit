@@ -1,6 +1,10 @@
 use std::{env, fs, path::PathBuf};
 
-use rta_core::{audit_repository, json::render_json, report::render_markdown};
+use rta_core::{
+    audit_repository,
+    json::{render_json, render_scorecard_json},
+    report::render_markdown,
+};
 
 #[derive(Debug, Clone, Copy)]
 enum OutputFormat {
@@ -11,9 +15,16 @@ enum OutputFormat {
 
 #[derive(Debug)]
 struct Args {
+    command: Command,
     path: PathBuf,
     format: OutputFormat,
     output: Option<PathBuf>,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Command {
+    Audit,
+    Scorecard,
 }
 
 fn main() {
@@ -31,10 +42,18 @@ fn main() {
 fn run() -> Result<(), String> {
     let args = parse_args(env::args().skip(1))?;
     let report = audit_repository(&args.path)?;
-    let rendered = match args.format {
-        OutputFormat::Markdown => render_markdown(&report),
-        OutputFormat::Json => render_json(&report),
-        OutputFormat::Summary => render_summary(&report),
+    let rendered = match args.command {
+        Command::Audit => match args.format {
+            OutputFormat::Markdown => render_markdown(&report),
+            OutputFormat::Json => render_json(&report),
+            OutputFormat::Summary => render_summary(&report),
+        },
+        Command::Scorecard => match args.format {
+            OutputFormat::Json => render_scorecard_json(&report),
+            OutputFormat::Markdown | OutputFormat::Summary => {
+                return Err("scorecard currently supports --json only".to_string());
+            }
+        },
     };
 
     if let Some(path) = args.output {
@@ -53,6 +72,7 @@ where
 {
     let mut path = PathBuf::from(".");
     let mut format = OutputFormat::Markdown;
+    let mut command = Command::Audit;
     let mut output = None;
     let mut positional_path_seen = false;
     let mut iter = args.into_iter();
@@ -60,6 +80,10 @@ where
     while let Some(arg) = iter.next() {
         match arg.as_str() {
             "-h" | "--help" => return Err(usage().to_string()),
+            "scorecard" if !positional_path_seen && matches!(command, Command::Audit) => {
+                command = Command::Scorecard;
+                format = OutputFormat::Json;
+            }
             "--json" => format = OutputFormat::Json,
             "--markdown" => format = OutputFormat::Markdown,
             "--summary" => format = OutputFormat::Summary,
@@ -81,6 +105,7 @@ where
     }
 
     Ok(Args {
+        command,
         path,
         format,
         output,
@@ -112,12 +137,12 @@ fn render_summary(report: &rta_core::model::AuditReport) -> String {
 }
 
 fn usage() -> &'static str {
-    "Usage: rta [PATH] [--markdown|--json|--summary] [--output FILE]\n\nExamples:\n  rta . --summary\n  rta ./service --json\n  rta ./service --markdown --output audit-report.md"
+    "Usage:\n  rta [PATH] [--markdown|--json|--summary] [--output FILE]\n  rta scorecard [PATH] --json [--output FILE]\n\nExamples:\n  rta . --summary\n  rta ./service --json\n  rta ./service --markdown --output audit-report.md\n  rta scorecard ./service --json"
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_args, OutputFormat};
+    use super::{parse_args, Command, OutputFormat};
 
     #[test]
     fn parses_json_output() {
@@ -125,6 +150,21 @@ mod tests {
             Ok(args) => args,
             Err(err) => panic!("args parse failed: {err}"),
         };
+        assert!(matches!(args.format, OutputFormat::Json));
+        assert_eq!(args.path.to_string_lossy(), "repo");
+    }
+
+    #[test]
+    fn parses_scorecard_command() {
+        let args = match parse_args([
+            "scorecard".to_string(),
+            "repo".to_string(),
+            "--json".to_string(),
+        ]) {
+            Ok(args) => args,
+            Err(err) => panic!("args parse failed: {err}"),
+        };
+        assert!(matches!(args.command, Command::Scorecard));
         assert!(matches!(args.format, OutputFormat::Json));
         assert_eq!(args.path.to_string_lossy(), "repo");
     }
