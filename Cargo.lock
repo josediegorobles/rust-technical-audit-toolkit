@@ -34,14 +34,14 @@ dependencies = [
 
 [[package]]
 name = "rta-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "serde_json",
 ]
 
 [[package]]
 name = "rust-technical-audit-toolkit"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "rta-core",
  "serde_json",

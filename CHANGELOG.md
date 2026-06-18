@@ -1,13 +1,18 @@
 # Changelog
 
+## v0.2.1 - 2026-06-18
+
+### Added
+
+- Added `--repo-label` / `--repository-label` to render public demos without local filesystem paths.
+- Added public sample audit packs for Tokio, Axum, and Ratatui under `docs/audit-packs/`.
+
 ## v0.2.0 - 2026-06-18
 
 ### Added
 
 - Added `rta audit-pack [PATH] --output DIR` to generate a due diligence evidence pack.
-- Added `--repo-label` / `--repository-label` to render public demos without local filesystem paths.
 - Added evidence pack files: `executive-report.md`, `scorecard.json`, `evidence.json`, `risk-register.json`, `review-questions.md`, and `methodology.md`.
-- Added public sample audit packs for Tokio, Axum, and Ratatui under `docs/audit-packs/`.
 - Added stable schema versions for evidence and risk register JSON output.
 - Added score-driven and finding-driven review questions for manual diligence follow-up.
 - Added regression tests for audit pack file generation, JSON validity, Markdown sections, scorecard shape, scoring weights, and sample repository signals.
