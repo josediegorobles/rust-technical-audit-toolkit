@@ -2,6 +2,7 @@ pub mod analyzers;
 pub mod collector;
 pub mod json;
 pub mod model;
+pub mod pack;
 pub mod report;
 pub mod scoring;
 
