@@ -1,0 +1,30 @@
+{
+  "schema_version": "rta.scorecard.v1",
+  "repository_path": "tokio-rs/tokio",
+  "overall_score": 46,
+  "scores": {
+    "dependency_health": 36,
+    "code_quality": 8,
+    "architecture": 50,
+    "testing": 100,
+    "risk_posture": 62
+  },
+  "metrics": {
+    "crate_count": 12,
+    "package_count": 12,
+    "direct_dependencies": 39,
+    "lines_of_rust_code": 96778,
+    "rust_modules": 784,
+    "function_count": 8919,
+    "average_function_size": 12.4,
+    "unit_test_files": 73,
+    "integration_test_files": 283,
+    "test_function_count": 1917
+  },
+  "risk_findings": {
+    "total": 3,
+    "high": 1,
+    "medium": 2,
+    "low": 0
+  }
+}

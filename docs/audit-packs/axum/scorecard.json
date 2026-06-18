@@ -1,0 +1,30 @@
+{
+  "schema_version": "rta.scorecard.v1",
+  "repository_path": "tokio-rs/axum",
+  "overall_score": 46,
+  "scores": {
+    "dependency_health": 21,
+    "code_quality": 16,
+    "architecture": 60,
+    "testing": 100,
+    "risk_posture": 52
+  },
+  "metrics": {
+    "crate_count": 59,
+    "package_count": 59,
+    "direct_dependencies": 88,
+    "lines_of_rust_code": 30463,
+    "rust_modules": 297,
+    "function_count": 2522,
+    "average_function_size": 11.5,
+    "unit_test_files": 82,
+    "integration_test_files": 125,
+    "test_function_count": 184
+  },
+  "risk_findings": {
+    "total": 4,
+    "high": 1,
+    "medium": 3,
+    "low": 0
+  }
+}

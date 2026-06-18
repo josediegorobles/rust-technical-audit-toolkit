@@ -2,20 +2,20 @@
 
 **72h Technical Due Diligence Flash for Rust codebases.**
 
-![Audited 3 famous crates](https://img.shields.io/badge/audited-3%20famous%20crates-2ea44f)
+![Sample audit packs](https://img.shields.io/badge/sample-audit%20packs-2ea44f)
 ![CLI scorecard](https://img.shields.io/badge/CI-scorecard%20JSON-blue)
 ![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green)
 ![crates.io](https://img.shields.io/crates/v/rust-technical-audit-toolkit)
 
-In 30 seconds, a founder, VC, or CTO can see the kind of diligence output the toolkit generates:
+In 30 seconds, a founder, VC, or CTO can open a complete sample evidence pack and see the kind of diligence output the toolkit generates:
 
-| Audited crate | Overall | Sub-scores | Report |
+| Public repository | Overall | Evidence pack | Executive report |
 | --- | ---: | --- | --- |
-| Tokio | 46/100 | deps 36, quality 8, arch 50, tests 100, risk 62 | [docs/sample-reports/tokio.md](docs/sample-reports/tokio.md) |
-| Axum | 46/100 | deps 21, quality 16, arch 60, tests 100, risk 52 | [docs/sample-reports/axum.md](docs/sample-reports/axum.md) |
-| Sled | 64/100 | deps 76, quality 16, arch 70, tests 100, risk 82 | [docs/sample-reports/sled.md](docs/sample-reports/sled.md) |
+| Tokio | 46/100 | [docs/audit-packs/tokio](docs/audit-packs/tokio/README.md) | [executive-report.md](docs/audit-packs/tokio/executive-report.md) |
+| Axum | 46/100 | [docs/audit-packs/axum](docs/audit-packs/axum/README.md) | [executive-report.md](docs/audit-packs/axum/executive-report.md) |
+| Ratatui | 47/100 | [docs/audit-packs/ratatui](docs/audit-packs/ratatui/README.md) | [executive-report.md](docs/audit-packs/ratatui/executive-report.md) |
 
-Ratatui is also included as a fourth generated benchmark sample: [docs/sample-reports/ratatui.md](docs/sample-reports/ratatui.md).
+Sample packs are illustrative outputs from public repositories, not complete audits or judgments on those projects. The value is the repeatable evidence workflow: report, scorecard, evidence, risk register, review questions, and methodology.
 
 ```text
 Rust Technical Audit Toolkit
@@ -69,9 +69,9 @@ cargo run -p rust-technical-audit-toolkit -- examples/sample-rust-service --summ
 ## CLI Usage
 
 ```bash
-rta [PATH] [--markdown|--json|--summary] [--output FILE]
-rta scorecard [PATH] --json [--output FILE]
-rta audit-pack [PATH] --output DIR
+rta [PATH] [--markdown|--json|--summary] [--output FILE] [--repo-label LABEL]
+rta scorecard [PATH] --json [--output FILE] [--repo-label LABEL]
+rta audit-pack [PATH] --output DIR [--repo-label LABEL]
 ```
 
 Examples:
@@ -81,7 +81,7 @@ rta . --summary
 rta ./service --json
 rta ./service --markdown --output audit-report.md
 rta scorecard ./service --json --output scorecard.json
-rta audit-pack ./service --output audit-pack
+rta audit-pack ./service --output audit-pack --repo-label owner/repo
 ```
 
 ## CI Scorecard
@@ -151,6 +151,7 @@ See [.github/workflows/audit-pr.yml](.github/workflows/audit-pr.yml) and [docs/g
 
 Sample reports:
 
+- [Sample audit packs](docs/audit-packs/README.md)
 - [Tokio audit sample](docs/sample-reports/tokio.md)
 - [Axum audit sample](docs/sample-reports/axum.md)
 - [Sled audit sample](docs/sample-reports/sled.md)

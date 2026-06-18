@@ -24,6 +24,7 @@ struct Args {
     path: PathBuf,
     format: OutputFormat,
     output: Option<PathBuf>,
+    repo_label: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -47,7 +48,10 @@ fn main() {
 
 fn run() -> Result<(), String> {
     let args = parse_args(env::args().skip(1))?;
-    let report = audit_repository(&args.path)?;
+    let mut report = audit_repository(&args.path)?;
+    if let Some(repo_label) = args.repo_label {
+        report.repository_path = repo_label;
+    }
     if matches!(args.command, Command::AuditPack) {
         let output_dir = args
             .output
@@ -89,6 +93,7 @@ where
     let mut format = OutputFormat::Markdown;
     let mut command = Command::Audit;
     let mut output = None;
+    let mut repo_label = None;
     let mut positional_path_seen = false;
     let mut iter = args.into_iter();
 
@@ -111,6 +116,15 @@ where
                     .ok_or_else(|| "--output requires a path".to_string())?;
                 output = Some(PathBuf::from(value));
             }
+            "--repo-label" | "--repository-label" => {
+                let value = iter
+                    .next()
+                    .ok_or_else(|| "--repo-label requires a value".to_string())?;
+                if value.trim().is_empty() {
+                    return Err("--repo-label cannot be empty".to_string());
+                }
+                repo_label = Some(value);
+            }
             value if value.starts_with('-') => return Err(format!("unknown argument `{value}`")),
             value => {
                 if positional_path_seen {
@@ -127,6 +141,7 @@ where
         path,
         format,
         output,
+        repo_label,
     })
 }
 
@@ -180,7 +195,7 @@ fn render_summary(report: &AuditReport) -> String {
 }
 
 fn usage() -> &'static str {
-    "Usage:\n  rta [PATH] [--markdown|--json|--summary] [--output FILE]\n  rta scorecard [PATH] --json [--output FILE]\n  rta audit-pack [PATH] --output DIR\n\nExamples:\n  rta . --summary\n  rta ./service --json\n  rta ./service --markdown --output audit-report.md\n  rta scorecard ./service --json\n  rta audit-pack ./service --output audit-pack"
+    "Usage:\n  rta [PATH] [--markdown|--json|--summary] [--output FILE] [--repo-label LABEL]\n  rta scorecard [PATH] --json [--output FILE] [--repo-label LABEL]\n  rta audit-pack [PATH] --output DIR [--repo-label LABEL]\n\nExamples:\n  rta . --summary\n  rta ./service --json\n  rta ./service --markdown --output audit-report.md\n  rta scorecard ./service --json\n  rta audit-pack ./service --output audit-pack --repo-label owner/repo"
 }
 
 #[cfg(test)]
@@ -228,6 +243,8 @@ mod tests {
             "repo".to_string(),
             "--output".to_string(),
             "pack".to_string(),
+            "--repo-label".to_string(),
+            "owner/repo".to_string(),
         ]) {
             Ok(args) => args,
             Err(err) => panic!("args parse failed: {err}"),
@@ -241,6 +258,7 @@ mod tests {
                 .to_string_lossy(),
             "pack"
         );
+        assert_eq!(args.repo_label.as_deref(), Some("owner/repo"));
     }
 
     #[test]

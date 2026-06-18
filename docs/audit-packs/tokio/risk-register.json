@@ -1,0 +1,29 @@
+{
+  "schema_version": "rta.risk-register.v1",
+  "repository_path": "tokio-rs/tokio",
+  "risk_score": 62,
+  "finding_count": 3,
+  "findings": [
+    {
+      "id": "RISK-001",
+      "severity": "high",
+      "title": "Potential God modules",
+      "evidence": "tokio-stream/tests/stream_stream_map.rs, tokio-stream/src/stream_ext.rs, tokio-stream/src/stream_ext/collect.rs, tokio-stream/src/stream_map.rs, tokio-util/tests/time_delay_queue.rs, tokio-util/tests/task_join_map.rs, tokio-util/tests/length_delimited.rs, tokio-util/tests/sync_cancellation_token.rs, tokio-util/src/codec/length_delimited.rs, tokio-util/src/io/sync_bridge.rs, tokio-util/src/time/delay_queue.rs, tokio-util/src/task/join_map.rs, tokio-util/src/task/task_tracker.rs, tokio-util/src/sync/cancellation_token.rs, tokio-test/src/io.rs, tokio/tests/task_join_set.rs, tokio/tests/task_local_set.rs, tokio/tests/rt_unstable_metrics.rs, tokio/tests/macros_select.rs, tokio/tests/sync_mpsc.rs, tokio/tests/rt_common.rs, tokio/tests/rt_handle_block_on.rs, tokio/tests/io_buf_writer.rs, tokio/tests/async_send_sync.rs, tokio/tests/rt_threaded.rs, tokio/tests/rt_basic.rs, tokio/tests/sync_broadcast.rs, tokio/tests/sync_mpsc_weak.rs, tokio/tests/sync_watch.rs, tokio/tests/net_unix_pipe.rs, tokio/tests/udp.rs, tokio/tests/io_async_fd.rs, tokio/src/net/unix/stream.rs, tokio/src/net/unix/pipe.rs, tokio/src/net/unix/datagram/socket.rs, tokio/src/net/tcp/stream.rs, tokio/src/net/tcp/socket.rs, tokio/src/net/tcp/split_owned.rs, tokio/src/net/windows/named_pipe.rs, tokio/src/net/udp.rs, tokio/src/util/linked_list.rs, tokio/src/util/idle_notified_set.rs, tokio/src/lib.rs, tokio/src/io/async_fd.rs, tokio/src/io/util/async_write_ext.rs, tokio/src/io/util/async_read_ext.rs, tokio/src/io/async_write.rs, tokio/src/runtime/metrics/runtime.rs, tokio/src/runtime/metrics/histogram.rs, tokio/src/runtime/metrics/histogram/h2_histogram.rs, tokio/src/runtime/runtime.rs, tokio/src/runtime/handle.rs, tokio/src/runtime/blocking/pool.rs, tokio/src/runtime/io/scheduled_io.rs, tokio/src/runtime/tests/task.rs, tokio/src/runtime/scheduler/current_thread/mod.rs, tokio/src/runtime/scheduler/multi_thread/worker.rs, tokio/src/runtime/scheduler/multi_thread/queue.rs, tokio/src/runtime/time/entry.rs, tokio/src/runtime/mod.rs, tokio/src/runtime/task/core.rs, tokio/src/runtime/task/raw.rs, tokio/src/runtime/task/harness.rs, tokio/src/runtime/task/mod.rs, tokio/src/runtime/task/state.rs, tokio/src/runtime/driver.rs, tokio/src/runtime/builder.rs, tokio/src/time/interval.rs, tokio/src/macros/cfg.rs, tokio/src/macros/select.rs, tokio/src/task/local.rs, tokio/src/task/join_set.rs, tokio/src/task/coop/mod.rs, tokio/src/sync/notify.rs, tokio/src/sync/once_cell.rs, tokio/src/sync/oneshot.rs, tokio/src/sync/semaphore.rs, tokio/src/sync/batch_semaphore.rs, tokio/src/sync/rwlock.rs, tokio/src/sync/mod.rs, tokio/src/sync/mutex.rs, tokio/src/sync/watch.rs, tokio/src/sync/broadcast.rs, tokio/src/sync/mpsc/unbounded.rs, tokio/src/sync/mpsc/chan.rs, tokio/src/sync/mpsc/bounded.rs, tokio/src/fs/file/tests.rs, tokio/src/fs/open_options.rs, tokio/src/fs/file.rs, tokio/src/signal/unix.rs, tokio/src/signal/windows.rs, tokio/src/process/unix/mod.rs, tokio/src/process/mod.rs, tokio-macros/src/lib.rs, tokio-macros/src/entry.rs",
+      "recommendation": "Extract cohesive submodules and isolate orchestration from domain behavior."
+    },
+    {
+      "id": "RISK-002",
+      "severity": "medium",
+      "title": "Dependency maintenance risk",
+      "evidence": "tokio-test uses a non-registry or broad version declaration in tokio-stream/fuzz/Cargo.toml; tokio uses a non-registry or broad version declaration in stress-test/Cargo.toml; tokio uses a non-registry or broad version declaration in tests-build/Cargo.toml; tokio uses a non-registry or broad version declaration in examples/Cargo.toml; tokio-stream uses a non-registry or broad version declaration in examples/Cargo.toml; tokio-util uses a non-registry or broad version declaration in examples/Cargo.toml; tokio uses a non-registry or broad version declaration in tests-integration/Cargo.toml; tokio-test uses a non-registry or broad version declaration in tests-integration/Cargo.toml; tokio uses a non-registry or broad version declaration in benches/Cargo.toml; tokio-stream uses a non-registry or broad version declaration in benches/Cargo.toml; tokio-util uses a non-registry or broad version declaration in benches/Cargo.toml",
+      "recommendation": "Review dependency sourcing, version policy, and upgrade ownership."
+    },
+    {
+      "id": "RISK-003",
+      "severity": "medium",
+      "title": "Circular dependency risk",
+      "evidence": "tokio-util/src/lib.rs centralizes 26 module declarations; tokio/src/lib.rs centralizes 34 module declarations",
+      "recommendation": "Review module directionality and enforce dependency rules at crate boundaries."
+    }
+  ]
+}

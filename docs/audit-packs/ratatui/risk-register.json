@@ -1,0 +1,36 @@
+{
+  "schema_version": "rta.risk-register.v1",
+  "repository_path": "ratatui/ratatui",
+  "risk_score": 52,
+  "finding_count": 4,
+  "findings": [
+    {
+      "id": "RISK-001",
+      "severity": "high",
+      "title": "Potential God modules",
+      "evidence": "ratatui-termion/src/lib.rs, ratatui/tests/widgets_table.rs, ratatui/src/lib.rs, ratatui/src/init.rs, ratatui/src/widgets.rs, ratatui-termwiz/src/lib.rs, ratatui-termina/src/lib.rs, examples/apps/constraint-explorer/src/main.rs, examples/apps/flex/src/main.rs, ratatui-core/src/layout/rect.rs, ratatui-core/src/layout/layout.rs, ratatui-core/src/layout/constraint.rs, ratatui-core/src/style.rs, ratatui-core/src/terminal/render.rs, ratatui-core/src/terminal/inline.rs, ratatui-core/src/style/color.rs, ratatui-core/src/style/stylize.rs, ratatui-core/src/style/palette/material.rs, ratatui-core/src/style/palette/tailwind.rs, ratatui-core/src/backend/test.rs, ratatui-core/src/symbols/merge.rs, ratatui-core/src/symbols/border.rs, ratatui-core/src/text/line.rs, ratatui-core/src/text/span.rs, ratatui-core/src/text/text.rs, ratatui-core/src/buffer/cell.rs, ratatui-core/src/buffer/buffer.rs, ratatui-core/src/buffer/diff.rs, ratatui-crossterm/src/lib.rs, ratatui-widgets/src/chart.rs, ratatui-widgets/src/list.rs, ratatui-widgets/src/tabs.rs, ratatui-widgets/src/gauge.rs, ratatui-widgets/src/canvas/line.rs, ratatui-widgets/src/canvas/world.rs, ratatui-widgets/src/scrollbar.rs, ratatui-widgets/src/table/state.rs, ratatui-widgets/src/canvas.rs, ratatui-widgets/src/block.rs, ratatui-widgets/src/list/rendering.rs, ratatui-widgets/src/table.rs, ratatui-widgets/src/paragraph.rs, ratatui-widgets/src/reflow.rs, ratatui-widgets/src/sparkline.rs, ratatui-widgets/src/barchart.rs, ratatui-widgets/src/block/shadow.rs",
+      "recommendation": "Extract cohesive submodules and isolate orchestration from domain behavior."
+    },
+    {
+      "id": "RISK-002",
+      "severity": "medium",
+      "title": "Dependency maintenance risk",
+      "evidence": "ratatui uses a non-registry or broad version declaration in ratatui-termwiz/Cargo.toml; ratatui uses a non-registry or broad version declaration in ratatui-termina/Cargo.toml; ratatui uses a non-registry or broad version declaration in ratatui-widgets/Cargo.toml",
+      "recommendation": "Review dependency sourcing, version policy, and upgrade ownership."
+    },
+    {
+      "id": "RISK-003",
+      "severity": "medium",
+      "title": "Excessive dependency concentration",
+      "evidence": "63 direct dependencies were detected.",
+      "recommendation": "Identify strategic dependencies and remove low-value transitive surface area."
+    },
+    {
+      "id": "RISK-004",
+      "severity": "medium",
+      "title": "Circular dependency risk",
+      "evidence": "ratatui/benches/main.rs centralizes 26 module declarations; ratatui-widgets/src/lib.rs centralizes 37 module declarations",
+      "recommendation": "Review module directionality and enforce dependency rules at crate boundaries."
+    }
+  ]
+}
