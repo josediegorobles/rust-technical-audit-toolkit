@@ -10,14 +10,16 @@ impl Analyzer<TestingMaturity> for TestingAnalyzer {
 
         for file in snapshot.rust_files() {
             let content = file.content.as_deref().unwrap_or_default();
-            let has_unit_tests = content.contains("#[cfg(test)]") || content.contains("#[test]");
-            if has_unit_tests {
-                unit_test_files += 1;
-                test_function_count += content.matches("#[test]").count();
-                test_function_count += content.matches("#[tokio::test]").count();
-            }
-            if file.relative_path.starts_with("tests/") || file.relative_path.contains("/tests/") {
+            let is_integration_test =
+                file.relative_path.starts_with("tests/") || file.relative_path.contains("/tests/");
+            let has_unit_tests = content.contains("#[cfg(test)]") || has_test_attribute(content);
+
+            if is_integration_test {
                 integration_test_files += 1;
+                test_function_count += count_test_functions(content);
+            } else if has_unit_tests {
+                unit_test_files += 1;
+                test_function_count += count_test_functions(content);
             }
         }
 
@@ -46,4 +48,20 @@ impl Analyzer<TestingMaturity> for TestingAnalyzer {
             score: score.clamp(0, 100) as u8,
         }
     }
+}
+
+fn count_test_functions(content: &str) -> usize {
+    content
+        .lines()
+        .map(str::trim)
+        .filter(|line| is_test_attribute(line))
+        .count()
+}
+
+fn has_test_attribute(content: &str) -> bool {
+    content.lines().map(str::trim).any(is_test_attribute)
+}
+
+fn is_test_attribute(line: &str) -> bool {
+    line == "#[test]" || line.starts_with("#[tokio::test")
 }

@@ -20,12 +20,12 @@ Ratatui is also included as a fourth generated benchmark sample: [docs/sample-re
 ```text
 Rust Technical Audit Toolkit
 Repository: ./service
-Overall score: 94/100
+Overall score: 93/100
 Crates: 1
 Dependencies: 4 direct
 Maintainability: 100/100
 Architecture: 90/100
-Testing: 79/100
+Testing: 73/100
 Risks: 0 finding(s)
 ```
 
@@ -89,13 +89,26 @@ rta scorecard ./service --json --output scorecard.json
 ```json
 {
   "schema_version": "rta.scorecard.v1",
-  "overall_score": 94,
+  "repository_path": "examples/sample-rust-service",
+  "overall_score": 93,
   "scores": {
     "dependency_health": 96,
     "code_quality": 100,
     "architecture": 90,
-    "testing": 79,
+    "testing": 73,
     "risk_posture": 100
+  },
+  "metrics": {
+    "crate_count": 1,
+    "package_count": 1,
+    "direct_dependencies": 4,
+    "lines_of_rust_code": 71,
+    "rust_modules": 6,
+    "function_count": 9,
+    "average_function_size": 4.1,
+    "unit_test_files": 1,
+    "integration_test_files": 1,
+    "test_function_count": 2
   },
   "risk_findings": {
     "total": 0,

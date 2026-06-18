@@ -68,9 +68,17 @@ impl CargoManifest {
         let mut dev_dependencies = BTreeMap::new();
         let mut build_dependencies = BTreeMap::new();
         let mut section = String::new();
+        let mut collecting_workspace_members = false;
 
         for raw_line in content.lines() {
             let line = strip_comment(raw_line).trim();
+            if collecting_workspace_members {
+                workspace_members.extend(parse_array_items(line));
+                if line.contains(']') {
+                    collecting_workspace_members = false;
+                }
+                continue;
+            }
             if line.is_empty() {
                 continue;
             }
@@ -82,6 +90,9 @@ impl CargoManifest {
                 package_name = parse_value(line);
             } else if section == "workspace" && line.starts_with("members") {
                 workspace_members.extend(parse_array(line));
+                if line.contains('[') && !line.contains(']') {
+                    collecting_workspace_members = true;
+                }
             } else if is_dependency_section(&section) {
                 if let Some((name, version)) = parse_dependency(line) {
                     match section.as_str() {
@@ -191,15 +202,19 @@ fn parse_value(line: &str) -> Option<String> {
 fn parse_array(line: &str) -> Vec<String> {
     line.split_once('=')
         .and_then(|(_, value)| value.split_once('[').map(|(_, rest)| rest))
-        .and_then(|rest| rest.split_once(']').map(|(items, _)| items))
-        .map(|items| {
-            items
-                .split(',')
-                .map(|item| item.trim().trim_matches('"').to_string())
-                .filter(|item| !item.is_empty())
-                .collect()
-        })
+        .map(|rest| rest.split_once(']').map_or(rest, |(items, _)| items))
+        .map(parse_array_items)
         .unwrap_or_default()
+}
+
+fn parse_array_items(line: &str) -> Vec<String> {
+    line.trim()
+        .trim_start_matches('[')
+        .trim_end_matches(']')
+        .split(',')
+        .map(|item| item.trim().trim_matches('"').to_string())
+        .filter(|item| !item.is_empty())
+        .collect()
 }
 
 fn is_dependency_section(section: &str) -> bool {
@@ -222,4 +237,28 @@ fn parse_dependency(line: &str) -> Option<(String, String)> {
         .trim_matches('}')
         .to_string();
     Some((name.to_string(), version))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::CargoManifest;
+
+    #[test]
+    fn parses_multiline_workspace_members() {
+        let manifest = CargoManifest::parse(
+            "Cargo.toml",
+            r#"
+[workspace]
+members = [
+    "crates/audit-core",
+    "crates/audit-cli",
+]
+"#,
+        );
+
+        assert_eq!(
+            manifest.workspace_members,
+            ["crates/audit-core", "crates/audit-cli"]
+        );
+    }
 }

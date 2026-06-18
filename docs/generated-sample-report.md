@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Repository `/Users/jdrobpar/Documents/Codex/2026-06-05/you-are-a-senior-rust-architect/examples/sample-rust-service` received an overall technical due diligence score of **94/100**.
+Repository `examples/sample-rust-service` received an overall technical due diligence score of **93/100**.
 
 Single-package Rust repository with 1 Cargo manifest(s).
 
@@ -13,7 +13,7 @@ Single-package Rust repository with 1 Cargo manifest(s).
 | Dependency Health | 20% | 96 |
 | Code Quality | 25% | 100 |
 | Architecture | 25% | 90 |
-| Testing | 15% | 79 |
+| Testing | 15% | 73 |
 | Risk Posture | 15% | 100 |
 
 ## Architecture
@@ -42,7 +42,7 @@ Single-package Rust repository with 1 Cargo manifest(s).
 ## Testing
 
 - Unit and integration testing structures detected.
-- Unit test files: 2
+- Unit test files: 1
 - Integration test files: 1
 - Test functions: 2
 
