@@ -46,7 +46,7 @@ impl RepositorySnapshot {
             .filter(|file| file.relative_path.ends_with("Cargo.toml"))
             .filter_map(|file| file.content.as_deref().map(|content| (file, content)))
             .map(|(file, content)| CargoManifest::parse(&file.relative_path, content))
-            .collect();
+            .collect::<Result<Vec<_>, _>>()?;
 
         Ok(Self {
             root,
@@ -63,17 +63,17 @@ impl RepositorySnapshot {
 }
 
 impl CargoManifest {
-    fn parse(relative_path: &str, content: &str) -> Self {
-        let parsed = content.parse::<Value>().ok();
+    fn parse(relative_path: &str, content: &str) -> Result<Self, String> {
+        let parsed = content
+            .parse::<Value>()
+            .map_err(|err| format!("failed to parse {relative_path}: {err}"))?;
         let package_name = parsed
-            .as_ref()
-            .and_then(|manifest| manifest.get("package"))
+            .get("package")
             .and_then(|package| package.get("name"))
             .and_then(Value::as_str)
             .map(str::to_string);
         let workspace_members = parsed
-            .as_ref()
-            .and_then(|manifest| manifest.get("workspace"))
+            .get("workspace")
             .and_then(|workspace| workspace.get("members"))
             .and_then(Value::as_array)
             .map(|members| {
@@ -84,18 +84,18 @@ impl CargoManifest {
                     .collect()
             })
             .unwrap_or_default();
-        let dependencies = parse_dependency_table(parsed.as_ref(), "dependencies");
-        let dev_dependencies = parse_dependency_table(parsed.as_ref(), "dev-dependencies");
-        let build_dependencies = parse_dependency_table(parsed.as_ref(), "build-dependencies");
+        let dependencies = parse_dependency_table(&parsed, "dependencies");
+        let dev_dependencies = parse_dependency_table(&parsed, "dev-dependencies");
+        let build_dependencies = parse_dependency_table(&parsed, "build-dependencies");
 
-        Self {
+        Ok(Self {
             relative_path: relative_path.to_string(),
             package_name,
             workspace_members,
             dependencies,
             dev_dependencies,
             build_dependencies,
-        }
+        })
     }
 }
 
@@ -166,9 +166,9 @@ fn read_text_file(path: &Path, bytes: u64) -> Option<String> {
     fs::read_to_string(path).ok()
 }
 
-fn parse_dependency_table(manifest: Option<&Value>, section: &str) -> BTreeMap<String, String> {
+fn parse_dependency_table(manifest: &Value, section: &str) -> BTreeMap<String, String> {
     manifest
-        .and_then(|manifest| manifest.get(section))
+        .get(section)
         .and_then(Value::as_table)
         .map(|dependencies| {
             dependencies
@@ -201,7 +201,8 @@ members = [
     "crates/audit-cli",
 ]
 "#,
-        );
+        )
+        .expect("workspace manifest should parse");
 
         assert_eq!(
             manifest.workspace_members,
@@ -228,7 +229,8 @@ axum = { version = "0.7", features = ["json"] }
 [build-dependencies]
 cc = "1"
 "#,
-        );
+        )
+        .expect("dependency manifest should parse");
 
         assert_eq!(manifest.package_name.as_deref(), Some("fixture"));
         assert_eq!(manifest.dependencies["serde"], "1");
@@ -236,5 +238,13 @@ cc = "1"
         assert!(manifest.dependencies["remote-helper"].contains("git"));
         assert!(manifest.dev_dependencies["axum"].contains("\"0.7\""));
         assert_eq!(manifest.build_dependencies["cc"], "1");
+    }
+
+    #[test]
+    fn reports_invalid_toml() {
+        let err = CargoManifest::parse("Cargo.toml", "[dependencies")
+            .expect_err("invalid TOML should be rejected");
+
+        assert!(err.contains("failed to parse Cargo.toml"));
     }
 }
