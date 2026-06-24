@@ -4,6 +4,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use toml::Value;
+
 #[derive(Debug, Clone)]
 pub struct RepositorySnapshot {
     pub root: PathBuf,
@@ -62,54 +64,29 @@ impl RepositorySnapshot {
 
 impl CargoManifest {
     fn parse(relative_path: &str, content: &str) -> Self {
-        let mut package_name = None;
-        let mut workspace_members = Vec::new();
-        let mut dependencies = BTreeMap::new();
-        let mut dev_dependencies = BTreeMap::new();
-        let mut build_dependencies = BTreeMap::new();
-        let mut section = String::new();
-        let mut collecting_workspace_members = false;
-
-        for raw_line in content.lines() {
-            let line = strip_comment(raw_line).trim();
-            if collecting_workspace_members {
-                workspace_members.extend(parse_array_items(line));
-                if line.contains(']') {
-                    collecting_workspace_members = false;
-                }
-                continue;
-            }
-            if line.is_empty() {
-                continue;
-            }
-            if line.starts_with('[') && line.ends_with(']') {
-                section = line.trim_matches(&['[', ']'][..]).to_string();
-                continue;
-            }
-            if section == "package" && line.starts_with("name") {
-                package_name = parse_value(line);
-            } else if section == "workspace" && line.starts_with("members") {
-                workspace_members.extend(parse_array(line));
-                if line.contains('[') && !line.contains(']') {
-                    collecting_workspace_members = true;
-                }
-            } else if is_dependency_section(&section) {
-                if let Some((name, version)) = parse_dependency(line) {
-                    match section.as_str() {
-                        "dependencies" => {
-                            dependencies.insert(name, version);
-                        }
-                        "dev-dependencies" => {
-                            dev_dependencies.insert(name, version);
-                        }
-                        "build-dependencies" => {
-                            build_dependencies.insert(name, version);
-                        }
-                        _ => {}
-                    }
-                }
-            }
-        }
+        let parsed = content.parse::<Value>().ok();
+        let package_name = parsed
+            .as_ref()
+            .and_then(|manifest| manifest.get("package"))
+            .and_then(|package| package.get("name"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+        let workspace_members = parsed
+            .as_ref()
+            .and_then(|manifest| manifest.get("workspace"))
+            .and_then(|workspace| workspace.get("members"))
+            .and_then(Value::as_array)
+            .map(|members| {
+                members
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default();
+        let dependencies = parse_dependency_table(parsed.as_ref(), "dependencies");
+        let dev_dependencies = parse_dependency_table(parsed.as_ref(), "dev-dependencies");
+        let build_dependencies = parse_dependency_table(parsed.as_ref(), "build-dependencies");
 
         Self {
             relative_path: relative_path.to_string(),
@@ -189,54 +166,24 @@ fn read_text_file(path: &Path, bytes: u64) -> Option<String> {
     fs::read_to_string(path).ok()
 }
 
-fn strip_comment(line: &str) -> &str {
-    line.split('#').next().unwrap_or(line)
-}
-
-fn parse_value(line: &str) -> Option<String> {
-    line.split_once('=')
-        .map(|(_, value)| value.trim().trim_matches('"').to_string())
-        .filter(|value| !value.is_empty())
-}
-
-fn parse_array(line: &str) -> Vec<String> {
-    line.split_once('=')
-        .and_then(|(_, value)| value.split_once('[').map(|(_, rest)| rest))
-        .map(|rest| rest.split_once(']').map_or(rest, |(items, _)| items))
-        .map(parse_array_items)
+fn parse_dependency_table(manifest: Option<&Value>, section: &str) -> BTreeMap<String, String> {
+    manifest
+        .and_then(|manifest| manifest.get(section))
+        .and_then(Value::as_table)
+        .map(|dependencies| {
+            dependencies
+                .iter()
+                .map(|(name, value)| (name.clone(), dependency_value(value)))
+                .collect()
+        })
         .unwrap_or_default()
 }
 
-fn parse_array_items(line: &str) -> Vec<String> {
-    line.trim()
-        .trim_start_matches('[')
-        .trim_end_matches(']')
-        .split(',')
-        .map(|item| item.trim().trim_matches('"').to_string())
-        .filter(|item| !item.is_empty())
-        .collect()
-}
-
-fn is_dependency_section(section: &str) -> bool {
-    matches!(
-        section,
-        "dependencies" | "dev-dependencies" | "build-dependencies"
-    )
-}
-
-fn parse_dependency(line: &str) -> Option<(String, String)> {
-    let (name, raw_value) = line.split_once('=')?;
-    let name = name.trim();
-    if name.is_empty() {
-        return None;
-    }
-    let version = raw_value
-        .trim()
-        .trim_matches('"')
-        .trim_matches('{')
-        .trim_matches('}')
-        .to_string();
-    Some((name.to_string(), version))
+fn dependency_value(value: &Value) -> String {
+    value
+        .as_str()
+        .map(str::to_string)
+        .unwrap_or_else(|| value.to_string())
 }
 
 #[cfg(test)]
@@ -260,5 +207,34 @@ members = [
             manifest.workspace_members,
             ["crates/audit-core", "crates/audit-cli"]
         );
+    }
+
+    #[test]
+    fn parses_dependency_tables_without_losing_path_or_git_signals() {
+        let manifest = CargoManifest::parse(
+            "Cargo.toml",
+            r#"
+[package]
+name = "fixture"
+
+[dependencies]
+serde = "1"
+local-helper = { path = "../local-helper" }
+remote-helper = { git = "https://example.test/repo.git", rev = "abc123" }
+
+[dev-dependencies]
+axum = { version = "0.7", features = ["json"] }
+
+[build-dependencies]
+cc = "1"
+"#,
+        );
+
+        assert_eq!(manifest.package_name.as_deref(), Some("fixture"));
+        assert_eq!(manifest.dependencies["serde"], "1");
+        assert!(manifest.dependencies["local-helper"].contains("path"));
+        assert!(manifest.dependencies["remote-helper"].contains("git"));
+        assert!(manifest.dev_dependencies["axum"].contains("\"0.7\""));
+        assert_eq!(manifest.build_dependencies["cc"], "1");
     }
 }
