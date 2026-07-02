@@ -11,20 +11,20 @@ In 30 seconds, a founder, VC, or CTO can open a complete sample evidence pack an
 
 | Public repository | Overall | Evidence pack | Executive report |
 | --- | ---: | --- | --- |
-| Tokio | 46/100 | [docs/audit-packs/tokio](docs/audit-packs/tokio/README.md) | [executive-report.md](docs/audit-packs/tokio/executive-report.md) |
-| Axum | 46/100 | [docs/audit-packs/axum](docs/audit-packs/axum/README.md) | [executive-report.md](docs/audit-packs/axum/executive-report.md) |
-| Ratatui | 47/100 | [docs/audit-packs/ratatui](docs/audit-packs/ratatui/README.md) | [executive-report.md](docs/audit-packs/ratatui/executive-report.md) |
+| Tokio | 74/100 | [docs/audit-packs/tokio](docs/audit-packs/tokio/README.md) | [executive-report.md](docs/audit-packs/tokio/executive-report.md) |
+| Axum | 80/100 | [docs/audit-packs/axum](docs/audit-packs/axum/README.md) | [executive-report.md](docs/audit-packs/axum/executive-report.md) |
+| Ratatui | 81/100 | [docs/audit-packs/ratatui](docs/audit-packs/ratatui/README.md) | [executive-report.md](docs/audit-packs/ratatui/executive-report.md) |
 
 Sample packs are illustrative outputs from public repositories, not complete audits or judgments on those projects. The value is the repeatable evidence workflow: report, scorecard, evidence, risk register, review questions, and methodology.
 
 ```text
 Rust Technical Audit Toolkit
 Repository: ./service
-Overall score: 93/100
+Overall score: 90/100
 Crates: 1
 Dependencies: 4 direct
 Maintainability: 100/100
-Architecture: 90/100
+Architecture: 80/100
 Testing: 73/100
 Risks: 0 finding(s)
 ```
@@ -40,7 +40,7 @@ This is not a security scanner. It is not a linter. It is an engineering assessm
 | Repository overview | Crates, packages, workspace members, project size, language mix, Cargo manifests |
 | Dependency analysis | Direct dependencies, critical dependencies, broad or non-registry declarations, maintenance indicators |
 | Code quality | Lines of Rust code, module count, function count, average function size, large modules, God module candidates |
-| Architecture review | Layer vocabulary, domain boundaries, modularity, circular dependency risk indicators |
+| Architecture review | Workspace crate count, module depth, crate-relative fan-out, module centralization, real top-level module cycles |
 | Engineering risk | Bus factor concerns, single points of failure, complex modules, lack of tests, dependency concentration |
 | Testing maturity | Unit test presence, integration tests, test function count, testing structure |
 
@@ -92,11 +92,11 @@ rta audit-pack ./service --output audit-pack --repo-label owner/repo
 {
   "schema_version": "rta.scorecard.v1",
   "repository_path": "examples/sample-rust-service",
-  "overall_score": 93,
+  "overall_score": 90,
   "scores": {
     "dependency_health": 96,
     "code_quality": 100,
-    "architecture": 90,
+    "architecture": 80,
     "testing": 73,
     "risk_posture": 100
   },
@@ -107,7 +107,7 @@ rta audit-pack ./service --output audit-pack --repo-label owner/repo
     "lines_of_rust_code": 71,
     "rust_modules": 6,
     "function_count": 9,
-    "average_function_size": 4.1,
+    "average_function_size": 4.3,
     "unit_test_files": 1,
     "integration_test_files": 1,
     "test_function_count": 2
@@ -159,17 +159,16 @@ Sample reports:
 
 ## Scoring Model
 
-The first scoring model is intentionally transparent:
-
-| Area | Weight |
-| --- | ---: |
-| Dependency Health | 20% |
-| Code Quality | 25% |
-| Architecture | 25% |
-| Testing | 15% |
-| Risk Posture | 15% |
-
-Scores are heuristic indicators, not absolute judgments. The tool is designed to make senior review faster by surfacing where manual diligence should focus. Unsupported metrics are omitted rather than fabricated.
+The score is a weighted triage indicator: Dependency Health 20%, Code Quality 25%, Architecture 25%, Testing 15%, and Risk Posture 15%.
+Code Quality normalizes large and God modules against the repository's own module-size distribution, using absolute thresholds only as floors.
+Architecture uses structural signals: workspace crate count, average module depth, `use crate::` fan-out between top-level modules, module centralization, and real top-level cycles.
+Testing rewards visible unit and integration structure; Dependency Health highlights direct dependency surface, critical dependencies, broad declarations, and pre-1.0 API indicators.
+Risk Posture converts material findings into a review discount rather than hiding them inside one opaque score.
+90-100 is excellent and should mainly prompt verification of assumptions.
+80-89 is strong with review items worth confirming before relying on the system.
+65-79 is workable but warrants focused senior review and follow-up questions.
+50-64 indicates material diligence concerns that can affect delivery confidence.
+Below 50 means the repo needs remediation or deeper manual review before a favorable diligence conclusion.
 
 ## Architecture
 
@@ -183,8 +182,6 @@ Analyzer modules implement a shared trait and consume a `RepositorySnapshot`. Re
 
 ## Roadmap
 
-- Parser-backed Rust syntax analysis
-- Cargo metadata integration
 - Optional `cargo outdated` integration
 - Trend comparison between audit runs
 - HTML report output

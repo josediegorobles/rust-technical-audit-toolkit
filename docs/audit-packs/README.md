@@ -6,9 +6,9 @@ They are **not** complete audits, endorsements, or judgments on the quality of t
 
 | Repository | Source commit | Overall | Evidence pack |
 | --- | --- | ---: | --- |
-| `tokio-rs/tokio` | [`7892f60`](https://github.com/tokio-rs/tokio/commit/7892f6020d9c914a41d0c350693fb71937d43c03) | 46/100 | [Open pack](tokio/README.md) |
-| `tokio-rs/axum` | [`485c603`](https://github.com/tokio-rs/axum/commit/485c603dddcee45bb4bc40aab492b47576e2a2f8) | 46/100 | [Open pack](axum/README.md) |
-| `ratatui/ratatui` | [`e306ce6`](https://github.com/ratatui/ratatui/commit/e306ce69df3113d41c00c483e36ba3ecc88f3c79) | 47/100 | [Open pack](ratatui/README.md) |
+| `tokio-rs/tokio` | [`9fe3c56`](https://github.com/tokio-rs/tokio/commit/9fe3c5619dced7157fe46104641d2e1d0af44417) | 74/100 | [Open pack](tokio/README.md) |
+| `tokio-rs/axum` | [`b90b8e0`](https://github.com/tokio-rs/axum/commit/b90b8e02d0f761ce36a13610acd2afa60984a5e2) | 80/100 | [Open pack](axum/README.md) |
+| `ratatui/ratatui` | [`f8c7866`](https://github.com/ratatui/ratatui/commit/f8c78660742a5ce240b4a8c26d51eff42d897a4f) | 81/100 | [Open pack](ratatui/README.md) |
 
 ## Files In Each Pack
 

@@ -1,30 +1,30 @@
 {
   "schema_version": "rta.scorecard.v1",
   "repository_path": "ratatui/ratatui",
-  "overall_score": 47,
+  "overall_score": 81,
   "scores": {
-    "dependency_health": 49,
-    "code_quality": 8,
-    "architecture": 50,
+    "dependency_health": 64,
+    "code_quality": 92,
+    "architecture": 84,
     "testing": 100,
-    "risk_posture": 52
+    "risk_posture": 62
   },
   "metrics": {
     "crate_count": 42,
     "package_count": 42,
-    "direct_dependencies": 63,
-    "lines_of_rust_code": 54584,
+    "direct_dependencies": 54,
+    "lines_of_rust_code": 54587,
     "rust_modules": 240,
-    "function_count": 3285,
-    "average_function_size": 13.0,
+    "function_count": 2998,
+    "average_function_size": 13.5,
     "unit_test_files": 89,
     "integration_test_files": 19,
     "test_function_count": 1069
   },
   "risk_findings": {
-    "total": 4,
+    "total": 3,
     "high": 1,
-    "medium": 3,
+    "medium": 2,
     "low": 0
   }
 }

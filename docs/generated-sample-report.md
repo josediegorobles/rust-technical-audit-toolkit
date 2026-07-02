@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Repository `examples/sample-rust-service` received an overall technical due diligence score of **93/100**.
+Repository `examples/sample-rust-service` received an overall technical due diligence score of **90/100**.
 
 Single-package Rust repository with 1 Cargo manifest(s).
 
@@ -12,16 +12,16 @@ Single-package Rust repository with 1 Cargo manifest(s).
 | --- | ---: | ---: |
 | Dependency Health | 20% | 96 |
 | Code Quality | 25% | 100 |
-| Architecture | 25% | 90 |
+| Architecture | 25% | 80 |
 | Testing | 15% | 73 |
 | Risk Posture | 15% | 100 |
 
 ## Architecture
 
-- Style: layered single service or compact workspace
-- Separation of concerns: Clear layer vocabulary detected across the repository.
-- Detected layers: api, domain, repository, service
-- Domain boundaries: none detected
+- Style: single-crate compact codebase
+- Separation of concerns: Compact structure with limited module separation detected.
+- Detected layers: single crate, crate-relative module fan-out
+- Domain boundaries: crate:sample-rust-service, module:api, module:domain, module:repository, module:service
 
 ## Dependency Health
 
@@ -35,7 +35,7 @@ Single-package Rust repository with 1 Cargo manifest(s).
 - Lines of Rust code: 71
 - Rust modules: 6
 - Function count: 9
-- Average function size: 4.1 lines
+- Average function size: 4.3 lines
 - Large modules: none detected
 - Potential God modules: none detected
 
