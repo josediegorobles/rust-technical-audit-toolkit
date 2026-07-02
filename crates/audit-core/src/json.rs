@@ -161,10 +161,11 @@ fn code_quality_json(report: &AuditReport) -> String {
 
 fn architecture_json(report: &AuditReport) -> String {
     format!(
-        "{{\"detected_layers\":{},\"domain_boundaries\":{},\"circular_dependency_risks\":{},\"architecture_style\":{},\"separation_of_concerns\":{},\"score\":{}}}",
+        "{{\"detected_layers\":{},\"domain_boundaries\":{},\"module_centralization_risks\":{},\"circular_dependencies\":{},\"architecture_style\":{},\"separation_of_concerns\":{},\"score\":{}}}",
         string_array(&report.architecture.detected_layers),
         string_array(&report.architecture.domain_boundaries),
-        string_array(&report.architecture.circular_dependency_risks),
+        string_array(&report.architecture.module_centralization_risks),
+        string_array(&report.architecture.circular_dependencies),
         quoted(&report.architecture.architecture_style),
         quoted(&report.architecture.separation_of_concerns),
         report.architecture.score
@@ -282,7 +283,8 @@ mod tests {
             architecture: ArchitectureAssessment {
                 detected_layers: Vec::new(),
                 domain_boundaries: Vec::new(),
-                circular_dependency_risks: Vec::new(),
+                module_centralization_risks: Vec::new(),
+                circular_dependencies: Vec::new(),
                 architecture_style: "compact".into(),
                 separation_of_concerns: "clear".into(),
                 score: 75,
