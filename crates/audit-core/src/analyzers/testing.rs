@@ -65,3 +65,100 @@ fn has_test_attribute(content: &str) -> bool {
 fn is_test_attribute(line: &str) -> bool {
     line == "#[test]" || line.starts_with("#[tokio::test")
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use crate::{
+        analyzers::Analyzer,
+        collector::{CargoManifest, FileSnapshot, RepositorySnapshot},
+    };
+
+    use super::TestingAnalyzer;
+
+    #[test]
+    fn empty_repository_has_low_testing_maturity() {
+        let report = TestingAnalyzer.analyze(&snapshot(Vec::new()));
+
+        assert!(!report.has_tests);
+        assert_eq!(report.score, 20);
+    }
+
+    #[test]
+    fn typical_repository_detects_unit_and_integration_tests() {
+        let report = TestingAnalyzer.analyze(&snapshot(vec![
+            file(
+                "src/lib.rs",
+                "#[cfg(test)]\nmod tests {\n#[test]\nfn it_works() {}\n}\n",
+            ),
+            file("tests/smoke.rs", "#[test]\nfn smoke() {}\n"),
+        ]));
+
+        assert!(report.has_tests);
+        assert_eq!(report.unit_test_files, 1);
+        assert_eq!(report.integration_test_files, 1);
+        assert_eq!(report.test_function_count, 2);
+    }
+
+    #[test]
+    fn extreme_test_count_caps_score_at_hundred() {
+        let mut content = String::new();
+        for index in 0..80 {
+            content.push_str(&format!("#[test]\nfn test_{index}() {{}}\n"));
+        }
+        let report = TestingAnalyzer.analyze(&snapshot(vec![
+            file(
+                "src/lib.rs",
+                "#[cfg(test)]\nmod tests {\n#[test]\nfn unit() {}\n}\n",
+            ),
+            file(
+                "src/core.rs",
+                "#[cfg(test)]\nmod tests {\n#[test]\nfn unit() {}\n}\n",
+            ),
+            file(
+                "src/api.rs",
+                "#[cfg(test)]\nmod tests {\n#[test]\nfn unit() {}\n}\n",
+            ),
+            file(
+                "src/db.rs",
+                "#[cfg(test)]\nmod tests {\n#[test]\nfn unit() {}\n}\n",
+            ),
+            file("tests/many.rs", &content),
+            file("tests/smoke.rs", "#[test]\nfn smoke() {}\n"),
+        ]));
+
+        assert_eq!(report.test_function_count, 85);
+        assert_eq!(report.score, 100);
+    }
+
+    #[test]
+    fn adversarial_commented_test_attribute_is_ignored() {
+        let report = TestingAnalyzer.analyze(&snapshot(vec![file(
+            "src/lib.rs",
+            "// #[test]\n// fn fake() {}\npub fn real() {}\n",
+        )]));
+
+        assert!(!report.has_tests);
+        assert_eq!(report.test_function_count, 0);
+    }
+
+    fn snapshot(files: Vec<FileSnapshot>) -> RepositorySnapshot {
+        RepositorySnapshot {
+            root: PathBuf::from("/tmp/repo"),
+            files,
+            manifests: Vec::<CargoManifest>::new(),
+        }
+    }
+
+    fn file(relative_path: &str, content: &str) -> FileSnapshot {
+        FileSnapshot {
+            path: PathBuf::from("/tmp/repo").join(relative_path),
+            relative_path: relative_path.into(),
+            extension: Some("rs".into()),
+            bytes: content.len() as u64,
+            lines: content.lines().count(),
+            content: Some(content.into()),
+        }
+    }
+}
