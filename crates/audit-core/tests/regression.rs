@@ -190,12 +190,17 @@ fn sample_rust_service_detects_architecture_testing_and_dependencies() {
 
     assert_eq!(
         report.architecture.detected_layers,
-        ["api", "domain", "repository", "service"]
+        ["single crate", "crate-relative module fan-out"]
     );
     assert_eq!(
         report.architecture.architecture_style,
-        "layered single service or compact workspace"
+        "single-crate compact codebase"
     );
+    assert!(report
+        .architecture
+        .domain_boundaries
+        .iter()
+        .any(|boundary| boundary == "module:api"));
 
     assert!(report.testing.has_tests);
     assert_eq!(report.testing.unit_test_files, 1);
@@ -241,7 +246,8 @@ fn fixture_report() -> AuditReport {
         architecture: ArchitectureAssessment {
             detected_layers: vec!["api".into(), "domain".into(), "repository".into()],
             domain_boundaries: vec!["users".into()],
-            circular_dependency_risks: Vec::new(),
+            module_centralization_risks: Vec::new(),
+            circular_dependencies: Vec::new(),
             architecture_style: "layered single service or compact workspace".into(),
             separation_of_concerns:
                 "Some separation of concerns is visible, but boundaries should be reviewed.".into(),
@@ -304,7 +310,8 @@ fn empty_architecture() -> ArchitectureAssessment {
     ArchitectureAssessment {
         detected_layers: Vec::new(),
         domain_boundaries: Vec::new(),
-        circular_dependency_risks: Vec::new(),
+        module_centralization_risks: Vec::new(),
+        circular_dependencies: Vec::new(),
         architecture_style: String::new(),
         separation_of_concerns: String::new(),
         score: 0,

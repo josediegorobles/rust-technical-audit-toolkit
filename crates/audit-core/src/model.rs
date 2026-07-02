@@ -63,7 +63,8 @@ impl AnalysisSection for CodeQuality {}
 pub struct ArchitectureAssessment {
     pub detected_layers: Vec<String>,
     pub domain_boundaries: Vec<String>,
-    pub circular_dependency_risks: Vec<String>,
+    pub module_centralization_risks: Vec<String>,
+    pub circular_dependencies: Vec<String>,
     pub architecture_style: String,
     pub separation_of_concerns: String,
     pub score: u8,
