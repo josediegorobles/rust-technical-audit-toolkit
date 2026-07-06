@@ -23,7 +23,7 @@ jobs:
       comment: true
 ```
 
-The workflow installs the `rta` binary, generates both a Markdown report and `rta.scorecard.v1` JSON, uploads both artifacts, and maintains a single sticky PR comment.
+The workflow installs the `rta` binary, generates both a Markdown report and `rta.scorecard.v2` JSON, uploads both artifacts, and maintains a single sticky PR comment.
 
 Before the first crates.io release, call the workflow with a Git install override:
 

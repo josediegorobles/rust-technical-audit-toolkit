@@ -44,7 +44,7 @@ fn scorecard_json_schema_is_stable() {
     let scorecard: Value = serde_json::from_str(&render_scorecard_json(&fixture_report()))
         .expect("scorecard should be valid JSON");
 
-    assert_eq!(scorecard["schema_version"], "rta.scorecard.v1");
+    assert_eq!(scorecard["schema_version"], "rta.scorecard.v2");
     assert_eq!(scorecard["repository_path"], "/tmp/repo");
     assert_eq!(scorecard["overall_score"], 82);
 

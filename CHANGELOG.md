@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.3.0 - 2026-07-06
+
+### Changed
+
+- Recalibrated scoring by repository shape so mature, multi-crate repositories are judged against proportional signals instead of blunt absolute thresholds.
+  The previous thresholds over-penalized larger repositories for normal scale, which made public audit-pack scores less useful for comparison.
+- Switched `rta scorecard --json` to schema version `rta.scorecard.v2`.
+
+### Added
+
+- Added `cargo metadata` manifest discovery with fallback parsing when metadata is unavailable.
+- Expanded analyzer coverage and calibration tests for the recalibrated scoring model.
+
+### Breaking
+
+- Renamed the architecture JSON field `circular_dependency_risks` to `module_centralization_risks` in report and evidence-pack output. Consumers of scorecard or audit-pack JSON should migrate by reading `architecture.module_centralization_risks`; `rta.scorecard.v2` marks this JSON output shape change.
+
 ## v0.2.1 - 2026-06-18
 
 ### Added

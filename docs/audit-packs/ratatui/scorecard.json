@@ -1,5 +1,5 @@
 {
-  "schema_version": "rta.scorecard.v1",
+  "schema_version": "rta.scorecard.v2",
   "repository_path": "ratatui/ratatui",
   "overall_score": 81,
   "scores": {

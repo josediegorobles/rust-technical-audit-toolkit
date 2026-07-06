@@ -104,7 +104,7 @@ dependencies = [
 
 [[package]]
 name = "rta-core"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "cargo_metadata",
  "petgraph",
@@ -116,7 +116,7 @@ dependencies = [
 
 [[package]]
 name = "rust-technical-audit-toolkit"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "rta-core",
  "serde_json",

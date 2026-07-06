@@ -289,7 +289,7 @@ mod tests {
         }
 
         let scorecard = assert_valid_json(&output_dir.join("scorecard.json"));
-        assert_eq!(scorecard["schema_version"], "rta.scorecard.v1");
+        assert_eq!(scorecard["schema_version"], "rta.scorecard.v2");
         let evidence = assert_valid_json(&output_dir.join("evidence.json"));
         assert_eq!(evidence["schema_version"], "rta.evidence.v1");
         let risk_register = assert_valid_json(&output_dir.join("risk-register.json"));

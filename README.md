@@ -90,7 +90,7 @@ rta audit-pack ./service --output audit-pack --repo-label owner/repo
 
 ```json
 {
-  "schema_version": "rta.scorecard.v1",
+  "schema_version": "rta.scorecard.v2",
   "repository_path": "examples/sample-rust-service",
   "overall_score": 90,
   "scores": {

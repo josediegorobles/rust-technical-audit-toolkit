@@ -30,7 +30,7 @@ pub fn render_scorecard_json(report: &AuditReport) -> String {
     format!(
         concat!(
             "{{\n",
-            "  \"schema_version\": \"rta.scorecard.v1\",\n",
+            "  \"schema_version\": \"rta.scorecard.v2\",\n",
             "  \"repository_path\": {},\n",
             "  \"overall_score\": {},\n",
             "  \"scores\": {{\n",
@@ -306,7 +306,7 @@ mod tests {
 
         let rendered = render_scorecard_json(&report);
 
-        assert!(rendered.contains("\"schema_version\": \"rta.scorecard.v1\""));
+        assert!(rendered.contains("\"schema_version\": \"rta.scorecard.v2\""));
         assert!(rendered.contains("\"overall_score\": 82"));
         assert!(rendered.contains("\"risk_findings\""));
     }
